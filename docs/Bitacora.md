@@ -1,6 +1,6 @@
 # Bitácora Experimento - Observabilidad y Monitoreo
 
-**Nombre del estudiante:** _____________________________  
+**Nombre del estudiante:** Julian David Castiblanco Real  
 ---
 
 Cuando acabes no olvides ayudarnos evaluando tu ⭐[experiencia](https://forms.office.com/r/US1LARPmec)⭐
@@ -22,18 +22,18 @@ Cuando acabes no olvides ayudarnos evaluando tu ⭐[experiencia](https://forms.o
 
 **¿La aplicación se desplegó correctamente?** 
 
-- [ ] Sí
+- [X] Sí
 - [ ] No
 
 **Captura de pantalla de la aplicación funcionando:**
 
-> _[Inserta aquí la imagen de la aplicación corriendo en /api/]_
+> ![img.png](img.png)
+
+**Dns Publico**
+> ec2-52-201-255-189.compute-1.amazonaws.com
 
 ### 1.3. Observaciones y problemas encontrados (opcional)
 ```
-
-
-
 ```
 
 ---
@@ -44,10 +44,10 @@ Cuando acabes no olvides ayudarnos evaluando tu ⭐[experiencia](https://forms.o
 
 **Endpoints probados:**
 
-- [ ] `GET /api/`
-- [ ] `POST /api/shorten`
-- [ ] `GET /api/{shortCode}`
-- [ ] `GET /api/urls`
+- [X] `GET /api/`
+- [X] `POST /api/shorten`
+- [X] `GET /api/{shortCode}`
+- [X] `GET /api/urls`
 
 
 ### 2.0.2. Análisis de dos métricas relevantes
@@ -56,41 +56,62 @@ Cuando acabes no olvides ayudarnos evaluando tu ⭐[experiencia](https://forms.o
 
 **Nombre de la métrica:**  
 ```
+http_server_requests_seconds_max
 
 ```
 
 **Tipo de métrica:** 
 - [ ] Counter
-- [ ] Gauge 
+- [X] Gauge 
 - [ ] Histogram 
 - [ ] Summary
 
 **Descripción de qué información aporta:**
 ```
+Esta métrica indica el tiempo máximo de duración (en segundos) registrado para las
+peticiones HTTP del servidor dentro de la ventana de recolección de métricas.
 
-
+Permite identificar cuál fue la petición más lenta para un endpoint específico
+durante el intervalo de observación.
 
 ```
 
 **Relación con otras métricas (si aplica):**
 ```
-Ejemplo: Un aumento en peticiones HTTP podría influir en el uso de CPU
+Se relaciona directamente con:
 
+- http_server_requests_seconds_count → número total de peticiones.
+- http_server_requests_seconds_sum → suma total del tiempo de todas las peticiones.
+
+Estas métricas juntas permiten calcular tiempos promedio, analizar latencias
+y detectar endpoints con rendimiento deficiente.
+
+También puede relacionarse con métricas de infraestructura como:
+- uso de CPU
+- memoria JVM
+- número de threads
 
 ```
 
 **¿En que escenarios puede ayudar esta métrica?**
 ```
 
-
+- Detectar endpoints lentos dentro de la aplicación.
+- Identificar picos de latencia en ciertas rutas.
+- Analizar problemas de rendimiento en APIs.
+- Monitorear degradación del servicio cuando aumenta la carga.
+- Identificar operaciones que tardan demasiado (por ejemplo consultas a base de datos).
 
 ```
 
 **¿Qué etiquetas (labels) se utilizan para agrupar los datos?**
 ```
-Ejemplo: uri, method, status, instance, job, etc.
-
-
+error
+exception
+method
+outcome
+status
+uri
 
 ```
 
@@ -100,40 +121,63 @@ Ejemplo: uri, method, status, instance, job, etc.
 
 **Nombre de la métrica:**  
 ```
-
+http_server_requests_seconds
 ```
 
 **Tipo de métrica:** 
 - [ ] Counter
 - [ ] Gauge 
 - [ ] Histogram 
-- [ ] Summary
+- [X] Summary
 
 **Descripción de qué información aporta:**
 ```
+Esta métrica mide el tiempo de duración de las peticiones HTTP que recibe el servidor,
+expresado en segundos.
 
+El tipo Summary proporciona información agregada sobre las peticiones, incluyendo:
 
+- http_server_requests_seconds_count → número total de peticiones realizadas
+- http_server_requests_seconds_sum → suma total del tiempo que tardaron todas las peticiones
+
+Con estos valores se puede calcular el tiempo promedio de respuesta de las
+peticiones HTTP del sistema.
 
 ```
 
 **Relación con otras métricas (si aplica):**
 ```
-Ejemplo: Un aumento en peticiones HTTP podría influir en el uso de CPU
+Se relaciona con:
 
+- http_server_requests_seconds_max → muestra la duración máxima de una petición
+- métricas de JVM (memoria, garbage collector)
+- métricas de CPU o uso de hilos
+
+Por ejemplo, si el tiempo total o el promedio de las peticiones aumenta,
+puede deberse a alto uso de CPU, consultas lentas a base de datos o alta carga
+de solicitudes HTTP.
 
 ```
 
 **¿En que escenarios puede ayudar esta métrica?**
 ```
 
-
+- Analizar el rendimiento general de la API.
+- Calcular el tiempo promedio de respuesta de los endpoints.
+- Detectar endpoints con mayor carga de solicitudes.
+- Identificar problemas de latencia en el servidor.
+- Evaluar el comportamiento del sistema bajo alta demanda.
 
 ```
 
 **¿Qué etiquetas (labels) se utilizan para agrupar los datos?**
 ```
-Ejemplo: uri, method, status, instance, job, etc.
-
+error
+exception
+method
+outcome
+status
+uri
 
 
 ```
@@ -147,7 +191,7 @@ Ejemplo: uri, method, status, instance, job, etc.
 
 **Captura de pantalla del dashboard:**
 
-> _[Inserta aquí la imagen del dashboard con los 4 paneles]_
+> ![img_1.png](img_1.png)_[Inserta aquí la imagen del dashboard con los 4 paneles]_
 
 ### 2.1.2. Visualizaciónes Adicionales (Con las metricas actuales)
 
@@ -156,24 +200,23 @@ Ejemplo: uri, method, status, instance, job, etc.
 **Propósito:**
 ```
 ¿Qué quieres analizar o mostrar? Menciona qué métrica(s) vas a usar
-
+Monitorear el porcentaje de CPU utilizado por la aplicación Java. Este panel permite detectar momentos en los que el sistema está consumiendo muchos recursos de procesamiento, lo que podría afectar el rendimiento o causar aumento en la latencia de las solicitudes.
 
 ```
 
 **Título del panel:**
 ```
-
+Uso de CPU de la aplicación
 ```
 
 **Consulta (PromQL o LogQL):**
 ```
-Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la consulta que se muestra en la caja de texto de la seccion Code.
-
+process_cpu_usage
 ```
 
 **Tipo de visualización:** 
 - [ ] Time series
-- [ ] Gauge
+- [X] Gauge
 - [ ] Bar chart
 - [ ] Stat
 - [ ] Logs
@@ -181,19 +224,23 @@ Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la 
 
 **Otros ajustes aplicados (colores, unidades, etc.) (opcional):**
 ```
-
+No
 
 ```
 
 **Captura de pantalla:**
 
-> _[Inserta aquí la imagen del panel]_
+> ![img_2.png](img_2.png)
 
 **Análisis (2-3 frases):**
 ```
 ¿Qué conclusiones o patrones observas?
-
-
+Este panel permite observar el consumo de CPU de la aplicación. 
+Un uso moderado indica que el sistema está funcionando de manera 
+eficiente. Sin embargo, si el valor se mantiene cercano al máximo 
+durante periodos prolongados, podría indicar que la aplicación está
+bajo una carga alta o que existen procesos que consumen demasiados 
+recursos.
 
 ```
 
@@ -204,24 +251,23 @@ Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la 
 **Propósito:**
 ```
 ¿Qué quieres analizar o mostrar? Menciona qué métrica(s) vas a mostrar
-
+Visualizar la cantidad de memoria utilizada por la JVM, lo cual es fundamental para detectar posibles problemas de memoria, como consumo excesivo o riesgo de OutOfMemoryError.
 
 ```
 
 **Título del panel:**
 ```
-
+Memoria utilizada por la JVM
 ```
 
 **Consulta (PromQL o LogQL):**
 ```
-Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la consulta que se muestra en la caja de texto de la seccion Code.
-
+sum(jvm_memory_used_bytes)
 ```
 
 **Tipo de visualización:** 
 - [ ] Time series
-- [ ] Gauge
+- [X] Gauge
 - [ ] Bar chart
 - [ ] Stat
 - [ ] Logs
@@ -229,18 +275,22 @@ Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la 
 
 **Otros ajustes aplicados (colores, unidades, etc.) (opcional):**
 ```
-
+No
 
 ```
 
 **Captura de pantalla:**
 
-> _[Inserta aquí la imagen del panel]_
+> ![img_3.png](img_3.png)
 
 **Análisis (2-3 frases):**
 ```
 ¿Qué conclusiones o patrones observas?
-
+Este panel muestra el consumo total de memoria de la JVM. 
+Un aumento progresivo en el uso de memoria puede ser normal si 
+la aplicación está manejando más solicitudes. Sin embargo, 
+si la memoria sigue creciendo sin disminuir, podría indicar un 
+posible memory leak o una mala gestión de recursos.
 
 
 ```
@@ -251,8 +301,19 @@ Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la 
 
 **¿Qué otros datos te gustaría visualizar si tuvieras más información disponible?**
 ```
-
-
+Si tuviera más información disponible, me gustaría visualizar 
+métricas relacionadas con el uso de recursos del sistema, 
+como CPU, memoria y almacenamiento, para identificar si la 
+infraestructura está siendo utilizada de manera eficiente o 
+si existe riesgo de saturación. También sería útil monitorear 
+métricas de la base de datos, como el tiempo de respuesta de las 
+consultas y el número de conexiones activas, para detectar posibles 
+cuellos de botella en el acceso a datos. Además, observar el número
+de usuarios activos o sesiones concurrentes permitiría relacionar 
+el rendimiento de la aplicación con el nivel real de uso. 
+Finalmente, métricas de tráfico y latencia de red ayudarían a 
+identificar problemas en la comunicación entre servicios o 
+componentes del sistema.
 
 ```
 
@@ -265,17 +326,18 @@ Consejo: Si usaste la interfaz de Grafana para crear el panel, puedes copiar la 
 
 **1. Nombre de la métrica:**
 ```
-Ejemplo: url_shortener_urls_created_total
-
+application_cpu_usage
 ```
 
 **2. Tipo de métrica:**
 - [ ] Counter
-- [ ] Gauge
+- [X] Gauge
 
 **3. ¿Qué comportamiento mide?**
 ```
-
+Mide el porcentaje de uso de CPU que está consumiendo la aplicación en el
+momento de la medición. Este valor refleja la carga actual del proceso
+de la aplicación dentro del sistema donde se está ejecutando.
 
 
 ```
@@ -283,7 +345,11 @@ Ejemplo: url_shortener_urls_created_total
 **4. ¿Por qué es relevante para el sistema?**
 ```
 
-
+Esta métrica permite monitorear el consumo de recursos de la aplicación,
+lo cual es fundamental para detectar situaciones de alta carga o posibles
+problemas de rendimiento. También ayuda a identificar cuándo la aplicación
+podría necesitar más recursos o escalamiento para mantener un buen
+desempeño bajo alta demanda.
 
 ```
 

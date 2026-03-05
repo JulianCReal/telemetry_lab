@@ -7,6 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import io.micrometer.core.instrument.Gauge;
+import java.lang.management.ManagementFactory;
+import com.sun.management.OperatingSystemMXBean;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -19,15 +23,29 @@ public class UrlShortenerService {
     private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int SHORT_CODE_LENGTH = 6;
 
+    private final Gauge cpuUsageGauge;
+
     private final Map<String, UrlMapping> urlStorage = new ConcurrentHashMap<>();
     private final Random random = new Random();
 
     private final Counter dummyCounter;
+    private final Counter urlShortenedCounter;
 
     public UrlShortenerService(MeterRegistry meterRegistry) {
         logger.info("UrlShortenerService initialized with in-memory storage");
+
         this.dummyCounter = Counter.builder("dummyCounter")
                 .description("dummy description")
+                .register(meterRegistry);
+
+        this.urlShortenedCounter = Counter.builder("url_shortener_urls_created_total")
+                .description("Total number of shortened URLs created")
+                .register(meterRegistry);
+
+        // MÉTRICA DE CPU
+        OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+        this.cpuUsageGauge = Gauge.builder("application_cpu_usage", osBean, bean -> bean.getProcessCpuLoad() * 100)
+                .description("CPU usage percentage of the application process")
                 .register(meterRegistry);
     }
 
